@@ -1,0 +1,57 @@
+# Ignore OS and IDE files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.bak
+*.tmp
+.vscode/
+.idea/
+
+# Ignore Docker volumes
+db_data/
+*.log
+
+# Ignore WordPress core files (if you want to version only your custom code)
+# Uncomment the next two lines if you want to ignore all core files
+# wp-admin/
+# wp-includes/
+
+# Ignore uploads (media files)
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/cache/
+wp-content/backup-*/
+
+# Ignore all plugins except your own (edit as needed)
+wp-content/plugins/*
+!wp-content/plugins/index.php
+# Uncomment and add your custom plugin(s) below, e.g.:
+# !wp-content/plugins/my-custom-plugin/
+
+# Ignore all themes except your own (edit as needed)
+wp-content/themes/*
+!wp-content/themes/index.php
+# Uncomment and add your custom theme(s) below, e.g.:
+# !wp-content/themes/my-custom-theme/
+
+# Ignore environment and config files (if you store secrets locally)
+.env
+.env.local
+.env.*.local
+
+# Ignore composer and node dependencies (if used)
+vendor/
+node_modules/
+
+# Ignore backup and export files
+*.sql
+*.tar
+*.tar.gz
+*.zip
+*.gz
+*.rar
+*.7z
+
+# Ignore wp-config.php if you don't want to version it
+# wp-config.php
