@@ -1,0 +1,46 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "thepi-core/events-grid",
+	"version": "0.1.0",
+	"title": "Thepi Event Grid",
+	"category": "widgets",
+	"icon": "calendar-alt",
+	"description": "Example block scaffolded with Create Block tool.",
+	"example": {},
+	"attributes": {
+		"gapX": {
+			"type": "number",
+			"default": 19
+		},
+		"gapY": {
+			"type": "number",
+			"default": 50
+		},
+		"initialAmount": {
+			"type": "number",
+			"default": 3
+		},
+		"showMore": {
+			"type": "boolean",
+			"default": false
+		},
+		"showMoreAmountEachTime": {
+			"type": "number",
+			"default": 3
+		}
+	},
+	"supports": {
+		"html": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"textdomain": "thepi-components",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php",
+	"viewScript": "file:./view.js"
+}

@@ -1,0 +1,54 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "thepi-core/gallery-grid",
+	"version": "0.1.0",
+	"title": "Thepi Gallery Grid",
+	"category": "widgets",
+	"icon": "format-gallery",
+	"description": "A customizable gallery grid block.",
+	"example": {},
+	"attributes": {
+		"columns": {
+			"type": "number",
+			"default": 9
+		},
+		"columnGap": {
+			"type": "string",
+			"default": "17px"
+		},
+		"rowGap": {
+			"type": "string",
+			"default": "17px"
+		},
+		"rowHeight": {
+			"type": "string",
+			"default": "400px"
+		},
+		"initialAmount": {
+			"type": "number",
+			"default": 7
+		},
+		"showMore": {
+			"type": "boolean",
+			"default": false
+		},
+		"showMoreAmountEachTime": {
+			"type": "number",
+			"default": 3
+		}
+	},
+	"supports": {
+		"html": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"textdomain": "thepi-gallery-grid",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php",
+	"viewScript": "file:./view.js"
+}

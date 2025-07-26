@@ -1,0 +1,90 @@
+/*!******************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/thepi-press-featuring-grid/style.scss ***!
+  \******************************************************************************************************************************************************************************************************************************************************************/
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+.thepi-press-featuring-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.thepi-press-featuring-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 50px 19px;
+  width: 100%;
+}
+
+.thepi-press-featuring-card {
+  text-decoration: none;
+}
+
+.thepi-press-featuring-thumb img {
+  width: 100%;
+  height: unset;
+  aspect-ratio: var(--wp--preset--aspect-ratio--square, 1);
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.thepi-press-featuring-title {
+  color: var(--wp--preset--color--gray-700);
+  font-size: var(--wp--preset--font-size--large, 1.875rem);
+  line-height: var(--wp--custom--line-height--tight, 1);
+  font-weight: bold;
+  padding: 0 0 5px 22px;
+  margin: 18px 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thepi-press-featuring-subtitle {
+  color: var(--wp--preset--color--cyan-700);
+  margin: 9px 0 0;
+  padding: 0 0 2px 22px;
+  font-size: var(--wp--preset--font-size--medium, 1.5625rem);
+  line-height: var(--wp--custom--line-height--normal, 1.2);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.thepi-press-featuring-subtitle p {
+  margin: 0;
+  padding: 0;
+}
+
+.thepi-press-featuring-show-more {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  width: 150px;
+  border: none;
+  border-radius: 0;
+  font-weight: bold;
+  font-size: var(--wp--preset--font-size--medium, 25px);
+  font-family: var(--wp--preset--font-family--primary);
+  background-color: var(--wp--preset--color--cyan-700, #265164) !important;
+  color: white !important;
+  margin-top: 110px !important;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.thepi-press-featuring-show-more:hover {
+  background-color: var(--wp--preset--color--surface, #eeede6) !important;
+  color: var(--wp--preset--color--cyan-400, #6e8b92) !important;
+}
+
+/*# sourceMappingURL=style-index.css.map*/

@@ -1,0 +1,98 @@
+.thepi-menu-carousel {
+	.thepi-menu-carousel__container {
+		position: relative;
+		overflow: hidden;
+		width: 100%;
+		padding-top: calc(100% * 13 / 12);
+		display: flex;
+		transition: padding-top 0.3s;
+	}
+	.thepi-menu-carousel__slide {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		max-width: 100%;
+		opacity: 0;
+		transition: all 0.3s;
+		z-index: 1;
+		border-radius: 4px;
+		object-fit: contain;
+		background: var(--wp--preset--color--surface, #eeede6);
+		&.active {
+			opacity: 1;
+			z-index: 2;
+		}
+	}
+	.thepi-menu-carousel__prev,
+	.thepi-menu-carousel__next {
+		position: absolute;
+		z-index: 10;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: transparent;
+		border: none;
+		border-radius: 999px;
+		width: 50px;
+		height: 100px;
+		opacity: 0.3;
+		cursor: pointer;
+		transition: all 0.3s;
+		&::after {
+			content: "";
+			display: block;
+			width: 20px;
+			height: 33px;
+			z-index: 1;
+		}
+		&::before {
+			content: "";
+			display: block;
+			position: absolute;
+			top: 0;
+			background-color: white;
+			height: 100%;
+			padding-left: 200%;
+			border-radius: 999px;
+			transition: all 0.3s;
+		}
+		&:hover {
+			opacity: 1 !important;
+			&::before {
+				box-shadow: 0 0 10px color-mix(in srgb, var(--wp--preset--color--gray-700, #000) 20%, transparent);
+			}
+		}
+	}
+	.thepi-menu-carousel__prev {
+		left: 0;
+		top: 50%;
+		transform: translateY(-50%);
+		&::after {
+			background: url("./assets/icons/arrow-left.svg") no-repeat center center;
+			transform: translateX(-3px);
+		}
+		&::before {
+			right: -5px;
+		}
+	}
+	.thepi-menu-carousel__next {
+		right: 0;
+		top: 50%;
+		transform: translateY(-50%);
+		&::after {
+			background: url("./assets/icons/arrow-right.svg") no-repeat center center;
+			transform: translateX(3px);
+		}
+		&::before {
+			left: -5px;
+		}
+	}
+
+	&:hover {
+		.thepi-menu-carousel__prev,
+		.thepi-menu-carousel__next {
+			opacity: 0.7;
+		}
+	}
+}
