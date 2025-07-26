@@ -1,0 +1,54 @@
+header {
+  z-index: 10;
+  .header-container {
+    transition: all 0.3s;
+  }
+  .wp-block-navigation {
+    .wp-block-navigation-item {
+      transition: all 0.3s;
+      position: relative;
+      &:not(.current-menu-item):hover {
+        opacity: 0.7;
+      }
+      .wp-block-navigation-item__label {
+        white-space: nowrap;
+      }
+    }
+    .current-menu-item {
+      font-weight: bold;
+      position: relative;
+      &::after {
+        content: "";
+        display: block;
+        position: absolute;
+        width: 44px;
+        height: 1px;
+        background-color: var(--wp--preset--color--cyan-200);
+        bottom: -4px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+  }
+  .custom-logo-link {
+    transition: all 0.3s;
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+header.home-page {
+  position: absolute;
+  z-index: 10;
+  width: 100vw;
+  top: 0;
+  left: 0;
+
+  .header-container {
+    background-color: transparent !important;
+  }
+  .header-content {
+    height: 262px;
+  }
+}

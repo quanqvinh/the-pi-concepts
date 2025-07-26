@@ -59,6 +59,9 @@ define('SECURE_AUTH_SALT',  '~iVE]yqJy!!?S~3xQY@)?}ShrY~WhTyN>>w1=~hJ<u2N6D>G0hR
 define('LOGGED_IN_SALT',    'er{ILJzLaTz|Q(&CbY9@|b5c*rE3PcOwutV$A:99ql:$?i2GfqKl<I!G]H:GJPCv');
 define('NONCE_SALT',        ';>-fS94Y^HF2F+FLiZ&y8fNzUth3v8DZZcUhei9r28pVz_A&M`xpabD#`%w$7ZF]');
 define('WP_CACHE_KEY_SALT', 'g~t@_oD M[wkR*vd>*HkSvhv]i8Q<hQM+`s^c#@kh7nu`&h64kA~Q=tCYl6U?dd*');
+define('WP_DEBUG', true);
+define('WP_DEBUG_DISPLAY', true);
+define('WP_DEBUG_LOG', true);
 
 
 /**#@-*/

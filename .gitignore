@@ -26,12 +26,14 @@ wp-content/backup-*/
 # Ignore all plugins except your own (edit as needed)
 wp-content/plugins/*
 !wp-content/plugins/index.php
+!wp-content/plugins/thepi-core/
 # Uncomment and add your custom plugin(s) below, e.g.:
 # !wp-content/plugins/my-custom-plugin/
 
 # Ignore all themes except your own (edit as needed)
 wp-content/themes/*
 !wp-content/themes/index.php
+!wp-content/themes/the-pi-concepts/
 # Uncomment and add your custom theme(s) below, e.g.:
 # !wp-content/themes/my-custom-theme/
 
