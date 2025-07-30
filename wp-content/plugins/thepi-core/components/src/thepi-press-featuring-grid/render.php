@@ -67,7 +67,7 @@ if (!$query->have_posts()) : ?>
 				$external_link = get_post_meta(get_the_ID(), 'press_featuring_external_link', true); ?>
 				<a href="<?php echo $external_link ?>" target="_blank" rel="noopener noreferrer" class="thepi-press-featuring-card" data-press-id="<?php echo esc_attr(get_the_ID()); ?>">
 					<?php if (has_post_thumbnail()) : ?>
-						<div class="thepi-press-featuring-thumb"><?php echo get_the_post_thumbnail(get_the_ID(), 'medium') ?></div>
+						<div class="thepi-press-featuring-thumb"><?php echo get_the_post_thumbnail(get_the_ID(), 'medium', ['draggable' => 'false']) ?></div>
 						<h3 class="thepi-press-featuring-title"><?php echo esc_html(get_the_title()) ?></h3>
 						<p class="thepi-press-featuring-subtitle"><?php echo esc_html($subtitle); ?></p>
 					<?php endif; ?>
@@ -76,14 +76,16 @@ if (!$query->have_posts()) : ?>
 			wp_reset_postdata(); ?>
 		</div>
 		<?php if ($show_more_enabled && $total_count > $initial_count) : ?>
-			<button
-				class="thepi-press-featuring-show-more"
-				type="button"
-				data-loaded-count="<?php echo esc_attr($initial_count); ?>"
-				data-show-more-each-time="<?php echo esc_attr($show_more_each_time); ?>"
-				data-total-count="<?php echo esc_attr($total_count); ?>">
-				Show More
-			</button>
+			<div class="wp-block-button">
+				<button
+					class="wp-element-button thepi-press-featuring-show-more"
+					type="button"
+					data-loaded-count="<?php echo esc_attr($initial_count); ?>"
+					data-show-more-each-time="<?php echo esc_attr($show_more_each_time); ?>"
+					data-total-count="<?php echo esc_attr($total_count); ?>">
+					Show More
+				</button>
+			</div>
 			<script>
 				(function() {
 					const btn = document.querySelector('.thepi-press-featuring-show-more');
@@ -106,10 +108,21 @@ if (!$query->have_posts()) : ?>
 								}
 								return response.json();
 							})
-							.then(function(posts) {
-								posts.forEach(function(post) {
+							.then(async function(posts) {
+								// Check loaded amount to hide/show button
+								const newLoaded = loaded + posts.length;
+								btn.setAttribute('data-loaded-count', newLoaded);
+
+								if (newLoaded >= total || posts.length < eachTime) {
+									btn.style.display = 'none';
+								} else {
+									btn.disabled = false;
+									btn.textContent = 'Show More';
+								}
+
+								for (var post of posts) {
 									const card = document.createElement('a');
-									card.className = 'thepi-press-featuring-card';
+									card.className = 'thepi-press-featuring-card appear-animation';
 									card.setAttribute('href', post.external_link || '#');
 									card.setAttribute('data-press-id', post.id);
 
@@ -122,15 +135,8 @@ if (!$query->have_posts()) : ?>
 
 									card.innerHTML = thumb + title + subtitle;
 									grid.appendChild(card);
-								});
-								const newLoaded = loaded + posts.length;
-								btn.setAttribute('data-loaded-count', newLoaded);
 
-								if (newLoaded >= total || posts.length < eachTime) {
-									btn.style.display = 'none';
-								} else {
-									btn.disabled = false;
-									btn.textContent = 'Show More';
+									await new Promise(resolve => setTimeout(resolve, 150))
 								}
 							})
 							.catch(function() {

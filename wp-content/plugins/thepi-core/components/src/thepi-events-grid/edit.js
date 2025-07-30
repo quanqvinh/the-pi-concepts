@@ -13,12 +13,7 @@ import { __ } from "@wordpress/i18n";
  */
 import { useBlockProps, InspectorControls } from "@wordpress/block-editor";
 import { useEffect, useState } from "@wordpress/element";
-import {
-	PanelBody,
-	ToggleControl,
-	RangeControl,
-	Button,
-} from "@wordpress/components";
+import { PanelBody, ToggleControl, RangeControl } from "@wordpress/components";
 
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -242,9 +237,8 @@ export default function Edit({ attributes, setAttributes }) {
 				)}
 			</div>
 			{shouldShowMoreButton && (
-				<Button
-					className="thepi-events-show-more"
-					variant="primary"
+				<button
+					className="thepi-events-show-more wp-element-button"
 					disabled={showMoreLoading}
 					onClick={handleShowMore}
 					style={{ marginTop: "110px" }}
@@ -252,7 +246,7 @@ export default function Edit({ attributes, setAttributes }) {
 					{showMoreLoading
 						? __("Loading...", "thepi-components")
 						: __("Show More", "thepi-components")}
-				</Button>
+				</button>
 			)}
 		</div>
 	);

@@ -7,8 +7,27 @@ header {
     .wp-block-navigation-item {
       transition: all 0.3s;
       position: relative;
+      &::after {
+        transition: all 0.3s;
+        content: "";
+        display: block;
+        position: absolute;
+        width: 0;
+        height: 1px;
+        background-color: var(--wp--preset--color--cyan-200);
+        bottom: -4px;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+      }
       &:not(.current-menu-item):hover {
-        opacity: 0.7;
+        filter: drop-shadow(
+          0px 0px 10px var(--wp--preset--color--gray-100, white)
+        );
+        &::after {
+          width: 44px;
+          opacity: 1;
+        }
       }
       .wp-block-navigation-item__label {
         white-space: nowrap;
@@ -18,22 +37,17 @@ header {
       font-weight: bold;
       position: relative;
       &::after {
-        content: "";
-        display: block;
-        position: absolute;
-        width: 44px;
-        height: 1px;
-        background-color: var(--wp--preset--color--cyan-200);
-        bottom: -4px;
-        left: 50%;
-        transform: translateX(-50%);
+        width: 44px !important;
+        opacity: 1 !important;
       }
     }
   }
   .custom-logo-link {
     transition: all 0.3s;
     &:hover {
-      opacity: 0.7;
+      filter: drop-shadow(
+        0px 0px 10px var(--wp--preset--color--gray-100, white)
+      );
     }
   }
 }

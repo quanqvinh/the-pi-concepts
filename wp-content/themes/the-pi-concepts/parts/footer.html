@@ -48,15 +48,18 @@
 				</p>
 				<!-- /wp:paragraph -->
 
-				<!-- wp:paragraph {"style":{"spacing":{"margin":{"top":"21.22px","bottom":"94.38px"}},"typography":{"lineHeight":"1.5"}},"fontSize":"small"} -->
-				<p
-					class="has-small-font-size"
+				<!-- wp:group {"style":{"typography":{"lineHeight":"1.5"},"spacing":{"margin":{"top":"21.22px","bottom":"94.38px"}}},"fontSize":"small","layout":{"type":"constrained"}} -->
+				<div
+					class="wp-block-group has-small-font-size"
 					style="margin-top: 21.22px; margin-bottom: 94.38px; line-height: 1.5"
 				>
-					070.866.2107<br />45 Huynh Khuong Ninh, Dakao Ward, District 1,
-					HCMC<br />info@thepiconcepts
-				</p>
-				<!-- /wp:paragraph -->
+					<!-- wp:thepi-core/store-info-phone {"separator":".","style":{"spacing":{"margin":{"top":"0px","bottom":"0px"}}}} /-->
+
+					<!-- wp:thepi-core/store-info-address {"style":{"spacing":{"margin":{"top":"0px","bottom":"0px"}}}} /-->
+
+					<!-- wp:thepi-core/store-info-email {"style":{"spacing":{"margin":{"top":"0px","bottom":"0px"}}}} /-->
+				</div>
+				<!-- /wp:group -->
 
 				<!-- wp:columns {"style":{"spacing":{"margin":{"bottom":"24px"}}}} -->
 				<div class="wp-block-columns" style="margin-bottom: 24px">
@@ -78,11 +81,14 @@
 							</p>
 							<!-- /wp:paragraph -->
 
-							<!-- wp:paragraph {"style":{"spacing":{"margin":{"top":"32px"}}},"fontSize":"small"} -->
-							<p class="has-small-font-size" style="margin-top: 32px">
-								Daily 04:00 PM - 02:00 AM
-							</p>
-							<!-- /wp:paragraph -->
+							<!-- wp:group {"style":{"spacing":{"margin":{"top":"32px","bottom":"0px"}}},"fontSize":"small","layout":{"type":"constrained"}} -->
+							<div
+								class="wp-block-group has-small-font-size"
+								style="margin-top: 32px; margin-bottom: 0px"
+							>
+								<!-- wp:thepi-core/store-info-open-time {"enablePrefix":true,"prefix":"Daily","displayFormat":"12h","amPmSpacing":true,"style":{"spacing":{"margin":{"top":"0px","bottom":"0px"}}}} /-->
+							</div>
+							<!-- /wp:group -->
 						</div>
 						<!-- /wp:group -->
 					</div>
@@ -106,8 +112,8 @@
 							</p>
 							<!-- /wp:paragraph -->
 
-							<!-- wp:group {"style":{"spacing":{"blockGap":"27px","margin":{"top":"30px"}}},"layout":{"type":"flex","flexWrap":"nowrap"}} -->
-							<div class="wp-block-group" style="margin-top: 30px">
+							<!-- wp:group {"className":"social-links","style":{"spacing":{"blockGap":"27px","margin":{"top":"30px"}}},"layout":{"type":"flex","flexWrap":"nowrap"}} -->
+							<div class="wp-block-group social-links" style="margin-top: 30px">
 								<!-- wp:image {"lightbox":{"enabled":false},"id":179,"width":"31px","sizeSlug":"full","linkDestination":"custom"} -->
 								<figure class="wp-block-image size-full is-resized">
 									<a
@@ -152,8 +158,8 @@
 
 		<!-- wp:column -->
 		<div class="wp-block-column" style="align-self: flex-end">
-			<!-- wp:group {"layout":{"type":"constrained"}} -->
-			<div class="wp-block-group" style="height: 469px">
+			<!-- wp:group {"className":"store-map","layout":{"type":"constrained"}} -->
+			<div class="wp-block-group store-map" style="height: 469px">
 				<!-- wp:html -->
 				<iframe
 					src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d413.6327663381299!2d106.69609988057637!3d10.78979376730547!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3175296236a418b1%3A0xee3dcc89958cedd2!2sthe%20Pi!5e0!3m2!1sen!2s!4v1751912741468!5m2!1sen!2s"
@@ -163,6 +169,7 @@
 					allowfullscreen=""
 					loading="lazy"
 					referrerpolicy="no-referrer-when-downgrade"
+					onload="this.classList.add('loaded')"
 				></iframe>
 				<!-- /wp:html -->
 			</div>

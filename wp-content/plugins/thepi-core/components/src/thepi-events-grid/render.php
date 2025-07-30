@@ -73,7 +73,7 @@ if (!$query->have_posts()) : ?>
 				$external_link = get_post_meta(get_the_ID(), 'event_external_link', true); ?>
 				<a href="<?php echo $external_link ?>" target="_blank" rel="noopener noreferrer" class="thepi-event-card" data-event-id="<?php echo esc_attr(get_the_ID()); ?>">
 					<?php if (has_post_thumbnail()) : ?>
-						<div class="thepi-event-thumb"><?php echo get_the_post_thumbnail(get_the_ID(), 'medium') ?></div>
+						<div class="thepi-event-thumb"><?php echo get_the_post_thumbnail(get_the_ID(), 'medium', ['draggable' => 'false']) ?></div>
 						<h3 class="thepi-event-title"><?php echo esc_html(get_the_title()) ?></h3>
 						<p class="thepi-event-subtitle"><?php echo esc_html($subtitle) ?></p>
 					<?php endif; ?>
@@ -82,14 +82,16 @@ if (!$query->have_posts()) : ?>
 			wp_reset_postdata(); ?>
 		</div>
 		<?php if ($show_more_enabled && $total_count > $initial_count) : ?>
-			<button
-				class="thepi-events-show-more"
-				type="button"
-				data-loaded-count="<?php echo esc_attr($initial_count); ?>"
-				data-show-more-each-time="<?php echo esc_attr($show_more_each_time); ?>"
-				data-total-count="<?php echo esc_attr($total_count); ?>">
-				Show More
-			</button>
+			<div class="wp-block-button">
+				<button
+					class="wp-element-button thepi-events-show-more"
+					type="button"
+					data-loaded-count="<?php echo esc_attr($initial_count); ?>"
+					data-show-more-each-time="<?php echo esc_attr($show_more_each_time); ?>"
+					data-total-count="<?php echo esc_attr($total_count); ?>">
+					Show More
+				</button>
+			</div>
 	</div>
 	<script>
 		(function() {
@@ -113,10 +115,22 @@ if (!$query->have_posts()) : ?>
 						}
 						return response.json();
 					})
-					.then(function(posts) {
-						posts.forEach(function(post) {
-							const card = document.createElement('div');
-							card.className = 'thepi-event-card';
+					.then(async function(posts) {
+						// Check loaded amount to hide/show button
+						const newLoaded = loaded + posts.length;
+						btn.setAttribute('data-loaded-count', newLoaded);
+
+						if (newLoaded >= total || posts.length < eachTime) {
+							btn.style.display = 'none';
+						} else {
+							btn.disabled = false;
+							btn.textContent = 'Show More';
+						}
+
+						for (var post of posts) {
+							const card = document.createElement('a');
+							card.className = 'thepi-event-card appear-animation';
+							card.setAttribute('href', post.external_link || '#');
 							card.setAttribute('data-event-id', post.id);
 
 							let thumb = '';
@@ -128,16 +142,9 @@ if (!$query->have_posts()) : ?>
 
 							card.innerHTML = thumb + title + subtitle;
 							grid.appendChild(card);
-						});
-						const newLoaded = loaded + posts.length;
-						btn.setAttribute('data-loaded-count', newLoaded);
 
-						if (newLoaded >= total || posts.length < eachTime) {
-							btn.style.display = 'none';
-						} else {
-							btn.disabled = false;
-							btn.textContent = 'Show More';
-						}
+							await new Promise(resolve => setTimeout(resolve, 150))
+						};
 					})
 					.catch(function() {
 						btn.disabled = false;

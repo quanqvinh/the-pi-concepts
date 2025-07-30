@@ -19,6 +19,7 @@ db_data/
 
 # Ignore uploads (media files)
 wp-content/uploads/
+wp-content/uploads-*/
 wp-content/upgrade/
 wp-content/cache/
 wp-content/backup-*/

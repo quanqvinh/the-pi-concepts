@@ -12,12 +12,7 @@
 		"images": {
 			"type": "array",
 			"items": {
-				"type": "object",
-				"properties": {
-					"url": { "type": "string" },
-					"name": { "type": "string" },
-					"alt": { "type": "string" }
-				}
+				"type": "number"
 			},
 			"default": []
 		},

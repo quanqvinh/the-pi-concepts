@@ -263,9 +263,9 @@
         },
         ":hover": {
           "color": {
-            "text": "var:preset|color|cyan-400",
-            "background": "var:preset|color|surface"
-          }
+            "background": "color-mix(in srgb, var(--wp--preset--color--cyan-700), var(--wp--preset--color--gray-700) 50%);"
+          },
+          "shadow": "var:preset|shadow|natural"
         },
         "css": "transition: all 0.3s; min-width: 150px !important;"
       }

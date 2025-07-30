@@ -2,12 +2,13 @@
 
 $block_attrs = $attributes ?? array();
 
-// Adjust for new images attribute type: array of objects with 'url', 'alt', etc.
-$images = array();
+// New: images is now an array of image IDs (ints)
+$image_ids = array();
 if (isset($block_attrs['images']) && is_array($block_attrs['images'])) {
-	foreach ($block_attrs['images'] as $img) {
-		if (is_array($img) && !empty($img['url'])) {
-			$images[] = $img;
+	foreach ($block_attrs['images'] as $img_id) {
+		// Only allow valid positive integers
+		if (is_numeric($img_id) && intval($img_id) > 0) {
+			$image_ids[] = intval($img_id);
 		}
 	}
 }
@@ -26,12 +27,29 @@ if (is_numeric($ar_width) && is_numeric($ar_height) && $ar_width > 0) {
 	$padding_top = (13 / 12) * 100 . '%'; // fallback
 }
 
-if (empty($images)) {
+if (empty($image_ids)) {
 	echo '<div ' . get_block_wrapper_attributes() . '>';
 	echo '<p>No images in carousel.</p>';
 	echo '</div>';
 } else {
 	$carousel_id = 'menu-carousel-' . uniqid();
+	// Preload all image data (url, alt, etc) for each ID
+	$images = array();
+	foreach ($image_ids as $img_id) {
+		$url = wp_get_attachment_image_url($img_id, 'full');
+		$alt = get_post_meta($img_id, '_wp_attachment_image_alt', true);
+		// fallback: use post title if alt is empty
+		if ($alt === '') {
+			$img_post = get_post($img_id);
+			$alt = $img_post ? $img_post->post_title : '';
+		}
+		if ($url) {
+			$images[] = array(
+				'url' => $url,
+				'alt' => $alt,
+			);
+		}
+	}
 ?>
 	<div <?php echo get_block_wrapper_attributes(['class' => 'thepi-menu-carousel']); ?>>
 		<div
@@ -44,7 +62,7 @@ if (empty($images)) {
 						src="<?php echo esc_url($img['url']); ?>"
 						class="thepi-menu-carousel__slide<?php echo $idx === 0 ? ' active' : ''; ?>"
 						data-carousel-index="<?php echo esc_attr($idx); ?>"
-						alt="<?php echo isset($img['alt']) ? esc_attr($img['alt']) : ''; ?>" />
+						alt="<?php echo esc_attr($img['alt']); ?>" />
 				<?php endforeach; ?>
 			</div>
 			<?php if (count($images) > 1): ?>
@@ -59,6 +77,23 @@ if (empty($images)) {
 			if (!carousel) return
 			var slides = carousel.querySelectorAll('.thepi-menu-carousel__slide')
 			var current = 0
+
+			// Fix onload event: add loaded class after image loads with delay
+			slides.forEach(function(slide) {
+				const addLoadedImageClasses = (slide) => {
+					setTimeout(function() {
+						slide.classList.add('loaded');
+					}, 500);
+				}
+
+				if (slide.complete) {
+					addLoadedImageClasses(slide)
+				} else {
+					slide.addEventListener('load', function() {
+						addLoadedImageClasses(slide)
+					});
+				}
+			});
 
 			function showSlide(idx) {
 				slides.forEach(function(slide, i) {

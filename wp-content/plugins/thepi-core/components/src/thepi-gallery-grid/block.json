@@ -14,16 +14,16 @@
 			"default": 9
 		},
 		"columnGap": {
-			"type": "string",
-			"default": "17px"
+			"type": "number",
+			"default": 17
 		},
 		"rowGap": {
-			"type": "string",
-			"default": "17px"
+			"type": "number",
+			"default": 17
 		},
 		"rowHeight": {
-			"type": "string",
-			"default": "400px"
+			"type": "number",
+			"default": 400
 		},
 		"initialAmount": {
 			"type": "number",
@@ -36,6 +36,10 @@
 		"showMoreAmountEachTime": {
 			"type": "number",
 			"default": 3
+		},
+		"enableLightBox": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {
@@ -48,7 +52,7 @@
 	"textdomain": "thepi-gallery-grid",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css",
+	"style": ["file:./style-index.css", "file:./view.css"],
 	"render": "file:./render.php",
 	"viewScript": "file:./view.js"
 }

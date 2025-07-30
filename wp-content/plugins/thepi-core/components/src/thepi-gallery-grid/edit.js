@@ -2,8 +2,6 @@ import { InspectorControls, useBlockProps } from "@wordpress/block-editor";
 import {
 	PanelBody,
 	RangeControl,
-	TextControl,
-	Button,
 	ToggleControl,
 	__experimentalNumberControl as NumberControl,
 } from "@wordpress/components";
@@ -13,12 +11,13 @@ import "./editor.scss";
 export default function Edit({ attributes, setAttributes }) {
 	const {
 		columns = 9,
-		columnGap = "17px",
-		rowGap = "17px",
-		rowHeight = "400px",
+		columnGap = 17,
+		rowGap = 17,
+		rowHeight = 400,
 		showMore = false,
 		showMoreAmountEachTime = 3,
 		initialAmount = 7,
+		enableLightBox = true,
 	} = attributes;
 
 	const blockProps = useBlockProps({
@@ -120,7 +119,7 @@ export default function Edit({ attributes, setAttributes }) {
 	return (
 		<div {...blockProps}>
 			<InspectorControls>
-				<PanelBody title="Grid Settings">
+				<PanelBody title="Grid Settings" initialOpen={true}>
 					<RangeControl
 						label="Columns"
 						value={columns}
@@ -128,24 +127,29 @@ export default function Edit({ attributes, setAttributes }) {
 						min={1}
 						max={20}
 					/>
-					<TextControl
-						label="Row Gap"
-						value={rowGap}
-						onChange={(val) => setAttributes({ rowGap: val })}
-						help="Any valid CSS unit (e.g. 1rem, 10px)"
-					/>
-					<TextControl
-						label="Column Gap"
+					<RangeControl
+						label="Column Gap (px)"
 						value={columnGap}
 						onChange={(val) => setAttributes({ columnGap: val })}
-						help="Any valid CSS unit (e.g. 1rem, 10px)"
+						min={0}
+						max={100}
 					/>
-					<TextControl
-						label="Row Height"
+					<RangeControl
+						label="Row Gap (px)"
+						value={rowGap}
+						onChange={(val) => setAttributes({ rowGap: val })}
+						min={0}
+						max={100}
+					/>
+					<RangeControl
+						label="Row Height (px)"
 						value={rowHeight}
 						onChange={(val) => setAttributes({ rowHeight: val })}
-						help="Any valid CSS unit (e.g. 1rem, 10px)"
+						min={50}
+						max={1000}
 					/>
+				</PanelBody>
+				<PanelBody title="Event Display" initialOpen={true}>
 					<RangeControl
 						label="Initial Amount"
 						value={initialAmount}
@@ -174,13 +178,22 @@ export default function Edit({ attributes, setAttributes }) {
 						/>
 					)}
 				</PanelBody>
+				<PanelBody title="Lightbox Settings" initialOpen={true}>
+					<ToggleControl
+						label="Enable Lightbox"
+						checked={!!enableLightBox}
+						onChange={(value) => setAttributes({ enableLightBox: value })}
+					/>
+				</PanelBody>
 			</InspectorControls>
 			<div
-				className="gallery-grid"
+				id="gallery-grid"
 				style={{
+					display: "grid",
 					gridTemplateColumns: `repeat(${parseInt(columns) || 9}, 1fr)`,
-					gridColumnGap: columnGap,
-					gridRowGap: rowGap,
+					columnGap: `${columnGap}px`,
+					rowGap: `${rowGap}px`,
+					gridAutoRows: `${rowHeight}px`,
 				}}
 			>
 				{items.map((item, idx) => (
@@ -188,7 +201,7 @@ export default function Edit({ attributes, setAttributes }) {
 						key={item.id || idx}
 						className="gallery-item"
 						style={{
-							height: rowHeight,
+							height: `${rowHeight}px`,
 						}}
 					>
 						{item.thumbnail ? (
@@ -221,15 +234,14 @@ export default function Edit({ attributes, setAttributes }) {
 				))}
 			</div>
 			{shouldShowMoreButton && (
-				<Button
-					className="gallery-show-more"
-					variant="primary"
+				<button
+					className="gallery-show-more wp-element-button"
 					disabled={showMoreLoading}
 					onClick={handleShowMore}
 					style={{ marginTop: "110px" }}
 				>
 					{showMoreLoading ? "Loading..." : "Show More"}
-				</Button>
+				</button>
 			)}
 		</div>
 	);

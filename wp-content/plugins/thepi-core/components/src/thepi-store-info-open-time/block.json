@@ -1,0 +1,66 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "thepi-core/store-info-open-time",
+	"version": "0.1.0",
+	"title": "Thepi Store Info Open Time",
+	"category": "widgets",
+	"icon": "clock",
+	"description": "Display the store's open and close time with optional styling.",
+	"example": {},
+	"attributes": {
+		"enablePrefix": {
+			"type": "boolean",
+			"default": false
+		},
+		"prefix": {
+			"type": "string",
+			"default": ""
+		},
+		"enableSuffix": {
+			"type": "boolean",
+			"default": false
+		},
+		"suffix": {
+			"type": "string",
+			"default": ""
+		},
+		"displayFormat": {
+			"type": "string",
+			"default": "24h",
+			"enum": ["24h", "12h"]
+		},
+		"separator": {
+			"type": "string",
+			"default": " - "
+		},
+		"amPmCase": {
+			"type": "string",
+			"default": "upper",
+			"enum": ["upper", "lower"]
+		},
+		"amPmSpacing": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": true,
+		"color": {
+			"background": true,
+			"text": true,
+			"link": true,
+			"enableContrastChecker": true
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": true
+	},
+	"textdomain": "thepi-components",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php"
+}

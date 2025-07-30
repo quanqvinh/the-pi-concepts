@@ -12,12 +12,7 @@ import { __ } from "@wordpress/i18n";
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
 import { useBlockProps, InspectorControls } from "@wordpress/block-editor";
-import {
-	PanelBody,
-	ToggleControl,
-	RangeControl,
-	Button,
-} from "@wordpress/components";
+import { PanelBody, ToggleControl, RangeControl } from "@wordpress/components";
 import { useEffect, useState } from "@wordpress/element";
 
 /**
@@ -205,10 +200,13 @@ export default function Edit({ attributes, setAttributes }) {
 				) : !pressFeaturing || pressFeaturing.length === 0 ? (
 					<div>{__("No press featuring found.", "thepi-components")}</div>
 				) : (
-					pressFeaturing.map((press) => (
+					pressFeaturing.map((press, index) => (
 						<div
 							key={press.id}
-							className="thepi-press-featuring-item"
+							className={
+								"thepi-press-featuring-card" +
+								(index >= initialAmount ? " appear-animation" : "")
+							}
 							data-press-id={press.id}
 						>
 							{press._embedded?.["wp:featuredmedia"]?.[0]?.source_url && (
@@ -231,9 +229,8 @@ export default function Edit({ attributes, setAttributes }) {
 				)}
 			</div>
 			{shouldShowMoreButton && (
-				<Button
-					className="thepi-press-featuring-show-more"
-					variant="primary"
+				<button
+					className="thepi-press-featuring-show-more wp-element-button"
 					disabled={showMoreLoading}
 					onClick={handleShowMore}
 					style={{ marginTop: "110px" }}
@@ -241,7 +238,7 @@ export default function Edit({ attributes, setAttributes }) {
 					{showMoreLoading
 						? __("Loading...", "thepi-components")
 						: __("Show More", "thepi-components")}
-				</Button>
+				</button>
 			)}
 		</div>
 	);

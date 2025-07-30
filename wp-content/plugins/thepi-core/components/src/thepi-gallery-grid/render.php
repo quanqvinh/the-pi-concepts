@@ -9,9 +9,17 @@
 
 $block_attrs = $attributes ?? array();
 
-$show_more_enabled = !empty($block_attrs['showMore']);
+// Adjust attribute type handling to match block.json (numbers, booleans)
+$show_more_enabled = !empty($block_attrs['showMore']) && filter_var($block_attrs['showMore'], FILTER_VALIDATE_BOOLEAN);
 $show_more_each_time = isset($block_attrs['showMoreAmountEachTime']) ? intval($block_attrs['showMoreAmountEachTime']) : 3;
 $initial_amount = isset($block_attrs['initialAmount']) ? intval($block_attrs['initialAmount']) : 7;
+
+// For new attributes in block.json
+$columns = isset($block_attrs['columns']) ? intval($block_attrs['columns']) : 9;
+$column_gap = isset($block_attrs['columnGap']) ? intval($block_attrs['columnGap']) : 17;
+$row_gap = isset($block_attrs['rowGap']) ? intval($block_attrs['rowGap']) : 17;
+$row_height = isset($block_attrs['rowHeight']) ? intval($block_attrs['rowHeight']) : 400;
+$enable_lightbox = !isset($block_attrs['enableLightBox']) || filter_var($block_attrs['enableLightBox'], FILTER_VALIDATE_BOOLEAN);
 
 // Query all galleries to get total count (for Show More logic)
 $total_query = new WP_Query([
@@ -48,29 +56,66 @@ if (!$initial_query->have_posts()) : ?>
 					'data-show-more-each-time' => esc_attr($show_more_each_time),
 					'data-total-count' => esc_attr($total_count),
 				]); ?>>
-		<div class="gallery-grid">
+		<div
+			id="gallery-grid"
+			data-lightbox-enable="<?php echo $enable_lightbox ? 'true' : 'false' ?>"
+			style="<?php
+							// Inline style for grid based on block.json attributes
+							echo 'display: grid;';
+							echo 'grid-template-columns: repeat(' . esc_attr($columns) . ', 1fr);';
+							echo 'column-gap: ' . esc_attr($column_gap) . 'px;';
+							echo 'row-gap: ' . esc_attr($row_gap) . 'px;';
+							echo 'grid-auto-rows: ' . esc_attr($row_height) . 'px;';
+							?>"
+			<?php
+			// Add attribute to indicate if show more button is displayed
+			$show_more_displayed = ($show_more_enabled && $total_count > $initial_amount) ? 'true' : 'false';
+			echo 'data-show-more-displayed="' . esc_attr($show_more_displayed) . '"';
+			?>>
 			<?php while ($initial_query->have_posts()) :
 				$initial_query->the_post(); ?>
-				<div class="gallery-item">
-					<?php echo get_the_post_thumbnail(get_the_ID(), 'medium') ?>
-				</div>
+				<?php
+				$image_id = get_post_thumbnail_id(get_the_ID());
+				$full_image_url = wp_get_attachment_image_url($image_id, 'full');
+				?>
+				<?php if ($enable_lightbox) : ?>
+					<a
+						class="gallery-item"
+						target="_blank"
+						href="<?php echo esc_url($full_image_url); ?>"
+						data-pswp-width="4000"
+						data-pswp-height="4000"
+						data-cropped="true">
+						<?php echo get_the_post_thumbnail(get_the_ID(), 'medium'); ?>
+					</a>
+				<?php else : ?>
+					<div class="gallery-item">
+						<?php echo get_the_post_thumbnail(get_the_ID(), 'medium'); ?>
+					</div>
+				<?php endif; ?>
 			<?php endwhile; ?>
 			<?php wp_reset_postdata(); ?>
 		</div>
 		<?php if ($show_more_enabled && $total_count > $initial_amount) : ?>
-			<button
-				class="gallery-show-more"
-				type="button"
-				data-loaded-count="<?php echo esc_attr($initial_amount); ?>"
-				data-show-more-each-time="<?php echo esc_attr($show_more_each_time); ?>"
-				data-total-count="<?php echo esc_attr($total_count); ?>">
-				Show More
-			</button>
+
+			<div class="wp-block-button">
+				<button
+					class="wp-element-button gallery-show-more"
+					type="button"
+					data-loaded-count="<?php echo esc_attr($initial_amount); ?>"
+					data-show-more-each-time="<?php echo esc_attr($show_more_each_time); ?>"
+					data-total-count="<?php echo esc_attr($total_count); ?>">
+					Show More
+				</button>
+			</div>
 			<script>
 				(function() {
 					const btn = document.querySelector('.gallery-show-more');
-					const grid = document.querySelector('.gallery-grid');
+					const grid = document.querySelector('#gallery-grid');
 					if (!btn || !grid) return;
+
+					// Pass PHP variable to JS for enableLightBox
+					const enableLightBox = <?php echo $enable_lightbox ? 'true' : 'false'; ?>;
 
 					btn.addEventListener('click', function() {
 						const loaded = parseInt(btn.getAttribute('data-loaded-count'), 10);
@@ -80,8 +125,6 @@ if (!$initial_query->have_posts()) : ?>
 						btn.disabled = true;
 						btn.textContent = 'Loading...';
 
-						// Use thepi/v1/gallery/show-more API, but pass orderby params for is_highlighted/date
-						// (If API doesn't support, you may need to update it. For now, we assume it returns correct order.)
 						fetch(`/wp-json/thepi/v1/gallery/show-more?limit=${eachTime}&offset=${loaded}`)
 							.then(function(response) {
 								if (!response.ok) {
@@ -89,22 +132,7 @@ if (!$initial_query->have_posts()) : ?>
 								}
 								return response.json();
 							})
-							.then(function(items) {
-								items.forEach(function(item) {
-									const div = document.createElement('div');
-									div.className = 'gallery-item';
-									if (item.thumbnail) {
-										const img = document.createElement('img');
-										img.src = item.thumbnail;
-										img.alt = item.title;
-										img.style.width = '100%';
-										img.style.height = 'auto';
-										div.appendChild(img);
-									} else {
-										div.textContent = 'No image';
-									}
-									grid.appendChild(div);
-								});
+							.then(async function(items) {
 								const newLoaded = loaded + items.length;
 								btn.setAttribute('data-loaded-count', newLoaded);
 
@@ -114,6 +142,37 @@ if (!$initial_query->have_posts()) : ?>
 									btn.disabled = false;
 									btn.textContent = 'Show More';
 								}
+
+								for (var item of items) {
+									let galleryEl;
+									if (enableLightBox) {
+										galleryEl = document.createElement('a');
+										galleryEl.href = item.thumbnail;
+										galleryEl.target = '_blank';
+										galleryEl.setAttribute('data-pswp-width', 4000);
+										galleryEl.setAttribute('data-pswp-height', 4000);
+										galleryEl.setAttribute('data-cropped', true);
+									} else {
+										galleryEl = document.createElement('div');
+									}
+									galleryEl.className = 'gallery-item appear-animation';
+
+									if (item.thumbnail) {
+										const img = document.createElement('img');
+										img.src = item.thumbnail;
+										img.alt = item.title;
+										img.style.width = '100%';
+										img.style.height = 'auto';
+										galleryEl.appendChild(img);
+									} else {
+										galleryEl.textContent = 'No image';
+									}
+									grid.appendChild(galleryEl);
+
+									await new Promise(resolve => setTimeout(resolve, 150));
+								}
+
+								grid.dispatchEvent(new Event('grid-load-more-done'));
 							})
 							.catch(function() {
 								btn.disabled = false;

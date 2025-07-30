@@ -46,7 +46,13 @@ add_action('init', function () {
 	));
 });
 
-// Add meta boxes for Phone, Email, and Address fields
+register_rest_field('store-info', 'meta', array(
+	'get_callback' => function ($data) {
+		return get_post_meta($data['id'], '');
+	},
+));
+
+// Add meta boxes for Phone, Email, Address, and Open/Close Time fields
 add_action('add_meta_boxes', function () {
 	add_meta_box(
 		'store_info_details',
@@ -65,121 +71,48 @@ function render_store_info_meta_box($post)
 	$phone   = get_post_meta($post->ID, 'phone', true);
 	$email   = get_post_meta($post->ID, 'email', true);
 	$address = get_post_meta($post->ID, 'address', true);
+	$open_time = get_post_meta($post->ID, 'open_time', true);
+	$close_time = get_post_meta($post->ID, 'close_time', true);
 ?>
-	<p>
-		<label for="store_info_phone"><strong>Phone</strong></label><br>
-		<input type="text" id="store_info_phone" name="store_info_phone" value="<?php echo esc_attr($phone); ?>" style="width:100%;" required>
-	</p>
-	<p>
-		<label for="store_info_email"><strong>Email</strong></label><br>
-		<input type="email" id="store_info_email" name="store_info_email" value="<?php echo esc_attr($email); ?>" style="width:100%;" required>
-	</p>
-	<p>
-		<label for="store_info_address"><strong>Address</strong></label><br>
-		<input type="text" id="store_info_address" name="store_info_address" value="<?php echo esc_attr($address); ?>" style="width:100%;" required>
-	</p>
-	<p>
-		<?php
-		// Get existing socials from post meta
-		$socials_json = get_post_meta($post->ID, 'socials', true);
-		$socials = [];
-		if (!empty($socials_json)) {
-			$socials = json_decode($socials_json, true);
-		}
-		if (!is_array($socials)) {
-			$socials = array();
-		}
-		?>
-	<div id="store-info-socials-wrapper">
-		<table style="width:100%; border-collapse:collapse; margin-bottom: 10px;" id="store-info-socials-table">
-			<thead>
-				<tr>
-					<th>Social Name</th>
-					<th>Social Icon (<a href="https://developer.wordpress.org/resource/dashicons" target="_blank" rel="noopener noreferrer">Search Dashicon key</a>)</th>
-					<th>Social Link</th>
-					<th>Hyper Text</th>
-					<th>Visible?</th>
-					<th>Remove</th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php if (!empty($socials)) : ?>
-					<?php foreach ($socials as $idx => $social) : ?>
-						<tr>
-							<td>
-								<input type="text" name="store_info_socials[<?php echo $idx; ?>][name]" value="<?php echo esc_attr($social['name'] ?? ''); ?>" style="width:100%;" required>
-							</td>
-							<td>
-								<input type="text" name="store_info_socials[<?php echo $idx; ?>][icon]" value="<?php echo esc_attr($social['icon'] ?? ''); ?>" style="width:100%;" placeholder="e.g. dashicons-facebook" required>
-							</td>
-							<td>
-								<input type="url" name="store_info_socials[<?php echo $idx; ?>][link]" value="<?php echo esc_attr($social['link'] ?? ''); ?>" style="width:100%;" required>
-							</td>
-							<td>
-								<input type="text" name="store_info_socials[<?php echo $idx; ?>][hyper_text]" value="<?php echo esc_attr($social['hyper_text'] ?? ''); ?>" style="width:100%;">
-							</td>
-							<td style="text-align:center;">
-								<input type="checkbox" name="store_info_socials[<?php echo $idx; ?>][visible]" value="1" <?php checked(!isset($social['visible']) || $social['visible']); ?>>
-							</td>
-							<td style="text-align:center;">
-								<button type="button" class="button remove-social-row" title="Remove Social">&times;</button>
-							</td>
-						</tr>
-					<?php endforeach; ?>
-				<?php endif; ?>
-			</tbody>
-		</table>
-		<button type="button" class="button" id="add-social-row">Add Social</button>
+	<div style="display: flex; gap: 16px; align-items: flex-end; margin-bottom: 16px;">
+		<div>
+			<label for="store_info_phone" style="display: inline-flex; align-items: center; margin-bottom: 2px;">
+				<span class="dashicons dashicons-phone" style="vertical-align:middle; margin-right:2px; font-size: 16px; height: unset;"></span>
+				<strong>Phone</strong>
+			</label><br>
+			<input type="text" id="store_info_phone" name="store_info_phone" value="<?php echo esc_attr($phone); ?>" style="width:150px;" required>
+		</div>
+		<div>
+			<label for="store_info_email" style="display: inline-flex; align-items: center; margin-bottom: 2px;">
+				<span class="dashicons dashicons-email" style="vertical-align:middle; margin-right:2px; font-size: 16px; height: unset;"></span>
+				<strong>Email</strong>
+			</label><br>
+			<input type="email" id="store_info_email" name="store_info_email" value="<?php echo esc_attr($email); ?>" style="width:240px;" required>
+		</div>
+		<div style="flex: 1;">
+			<label for="store_info_address" style="display: inline-flex; align-items: center; margin-bottom: 2px;">
+				<span class="dashicons dashicons-location" style="vertical-align:middle; margin-right:2px; font-size: 16px; height: unset;"></span>
+				<strong>Address</strong>
+			</label><br>
+			<input type="text" id="store_info_address" name="store_info_address" value="<?php echo esc_attr($address); ?>" style="width:100%;" required>
+		</div>
 	</div>
-	<script>
-		(function($) {
-			$(document).ready(function() {
-				let $table = $('#store-info-socials-table tbody');
-				let rowIdx = $table.find('tr').length;
-				$('#add-social-row').on('click', function(e) {
-					e.preventDefault();
-					let newRow = `<tr>
-					<td>
-						<input type="text" name="store_info_socials[` + rowIdx + `][name]" style="width:100%;" required>
-					</td>
-					<td>
-						<input type="text" name="store_info_socials[` + rowIdx + `][icon]" style="width:100%;" placeholder="e.g. dashicons-facebook" required>
-					</td>
-					<td>
-						<input type="url" name="store_info_socials[` + rowIdx + `][link]" style="width:100%;" required>
-					</td>
-					<td>
-						<input type="text" name="store_info_socials[` + rowIdx + `][hyper_text]" style="width:100%;">
-					</td>
-					<td style="text-align:center;">
-						<input type="checkbox" name="store_info_socials[` + rowIdx + `][visible]" value="1" checked>
-					</td>
-					<td style="text-align:center;">
-						<button type="button" class="button remove-social-row" title="Remove Social">&times;</button>
-					</td>
-				</tr>`;
-					$table.append(newRow);
-					rowIdx++;
-				});
-				$table.on('click', '.remove-social-row', function() {
-					$(this).closest('tr').remove();
-				});
-			});
-		})(jQuery);
-	</script>
-	<style>
-		#store-info-socials-table th,
-		#store-info-socials-table td {
-			border: 1px solid #ddd;
-			padding: 6px;
-		}
-
-		#store-info-socials-table th {
-			background: #f9f9f9;
-			text-align: left;
-		}
-	</style>
-	</p>
+	<div style="display: flex; gap: 16px; align-items: flex-end; margin-bottom: 24px;">
+		<div>
+			<label for="store_info_open_time" style="display: inline-flex; align-items: center; margin-bottom: 2px;">
+				<span class="dashicons dashicons-clock" style="vertical-align:middle; margin-right:2px; font-size: 16px; height: unset;"></span>
+				<strong>Open Time</strong>
+			</label><br>
+			<input type="time" id="store_info_open_time" name="store_info_open_time" value="<?php echo esc_attr($open_time); ?>" style="width:150px;">
+		</div>
+		<div>
+			<label for="store_info_close_time" style="display: inline-flex; align-items: center; margin-bottom: 2px;">
+				<span class="dashicons dashicons-clock" style="vertical-align:middle; margin-right:2px; font-size: 16px; height: unset;"></span>
+				<strong>Close Time</strong>
+			</label><br>
+			<input type="time" id="store_info_close_time" name="store_info_close_time" value="<?php echo esc_attr($close_time); ?>" style="width:150px;">
+		</div>
+	</div>
 <?php
 }
 
@@ -210,42 +143,16 @@ add_action('save_post_store-info', function ($post_id) {
 	if (isset($_POST['store_info_address'])) {
 		update_post_meta($post_id, 'address', sanitize_text_field($_POST['store_info_address']));
 	}
-	// Save Socials as JSON (include all input data for each social)
-	if (isset($_POST['store_info_socials']) && is_array($_POST['store_info_socials'])) {
-		$socials = [];
-		foreach ($_POST['store_info_socials'] as $row) {
-			$clean_row = [];
-			foreach ($row as $key => $value) {
-				// Sanitize each field appropriately
-				if (is_array($value)) {
-					// If somehow a value is an array, skip it
-					continue;
-				}
-				if (stripos($key, 'url') !== false) {
-					$clean_row[$key] = esc_url_raw($value);
-				} elseif (stripos($key, 'email') !== false) {
-					$clean_row[$key] = sanitize_email($value);
-				} else {
-					$clean_row[$key] = sanitize_text_field($value);
-				}
-			}
-			// Only add if at least one field is not empty
-			$has_data = false;
-			foreach ($clean_row as $v) {
-				if (!empty($v)) {
-					$has_data = true;
-					break;
-				}
-			}
-			if ($has_data) {
-				$socials[] = $clean_row;
-			}
-		}
-		update_post_meta($post_id, 'socials', wp_json_encode($socials));
-	} else {
-		// If no socials, delete the meta
-		delete_post_meta($post_id, 'socials');
+	// Save Open Time
+	if (isset($_POST['store_info_open_time'])) {
+		update_post_meta($post_id, 'open_time', sanitize_text_field($_POST['store_info_open_time']));
 	}
+	// Save Close Time
+	if (isset($_POST['store_info_close_time'])) {
+		update_post_meta($post_id, 'close_time', sanitize_text_field($_POST['store_info_close_time']));
+	}
+	// Remove socials meta if it exists (cleanup from previous versions)
+	delete_post_meta($post_id, 'socials');
 });
 
 // Prevent creating more than one "store-info" post and remove the "Trash" action
@@ -287,13 +194,14 @@ add_action('admin_menu', function () {
 	}
 });
 
-// Remove "Add New" button from the list table
+// Remove "Add New" button from the list table and edit post page
 add_action('admin_head', function () {
 	$screen = get_current_screen();
-	if ($screen && $screen->post_type === 'store-info' && $screen->base === 'edit') {
+	if ($screen && $screen->post_type === 'store-info') {
 		$count = wp_count_posts('store-info')->publish + wp_count_posts('store-info')->draft + wp_count_posts('store-info')->pending + wp_count_posts('store-info')->future + wp_count_posts('store-info')->private;
 		if ($count >= 1) {
-			echo '<style>.page-title-action { display: none !important; }</style>';
+			// Remove "Add New" button from list table and edit post page
+			echo '<style>.page-title-action, .wrap .page-title-action { display: none !important; }</style>';
 		}
 	}
 });

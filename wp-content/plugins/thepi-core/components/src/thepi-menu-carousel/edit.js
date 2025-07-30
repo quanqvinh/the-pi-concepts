@@ -4,53 +4,70 @@ import {
 	MediaUpload,
 	MediaUploadCheck,
 } from "@wordpress/block-editor";
-import {
-	PanelBody,
-	Button,
-	IconButton,
-	TextControl,
-} from "@wordpress/components";
-import { useEffect, useRef } from "react";
+import { PanelBody, Button, IconButton } from "@wordpress/components";
+import { useEffect, useRef, useState } from "react";
 
 export default function Edit({ attributes, setAttributes }) {
 	const blockProps = useBlockProps({
 		className: "thepi-menu-carousel",
 	});
 
-	// Use block attribute for images, fallback to empty array
-	const images = attributes.images || [];
+	// images is now an array of image IDs
+	const imageIds = Array.isArray(attributes.images) ? attributes.images : [];
+
+	// Store image data for preview
+	const [imageData, setImageData] = useState([]);
+
+	// Fetch image data for all IDs
+	useEffect(() => {
+		let isMounted = true;
+		if (!imageIds.length) {
+			setImageData([]);
+			return;
+		}
+		// Fetch all images in one request if possible
+		const fetchImages = async () => {
+			const idsParam = imageIds.join(",");
+			try {
+				const res = await fetch(
+					`/wp-json/wp/v2/media?include=${idsParam}&per_page=100`,
+				);
+				const data = await res.json();
+				// Map by ID for fast lookup
+				const dataById = {};
+				data.forEach((img) => {
+					dataById[img.id] = img;
+				});
+				// Order as per imageIds
+				const ordered = imageIds.map((id) => dataById[id] || null);
+				if (isMounted) setImageData(ordered);
+			} catch (e) {
+				if (isMounted) setImageData([]);
+			}
+		};
+		fetchImages();
+		return () => {
+			isMounted = false;
+		};
+	}, [imageIds]);
 
 	// Helper to update a single image at index
 	const updateImage = (index, media) => {
-		const newImages = [...images];
-		newImages[index] = {
-			url: media?.url || "",
-			name: media?.title || media?.filename || "",
-			alt: media?.alt || "",
-		};
-		setAttributes({ images: newImages });
+		const newIds = [...imageIds];
+		newIds[index] = media?.id || 0;
+		setAttributes({ images: newIds });
 	};
 
-	// Helper to update image alt or name at index
-	const updateImageField = (index, field, value) => {
-		const newImages = [...images];
-		newImages[index] = {
-			...(newImages[index] || {}),
-			[field]: value,
-		};
-		setAttributes({ images: newImages });
-	};
-
-	// Helper to add a new image slot
+	// Helper to add a new image slot (default to 0, which is invalid)
 	const addImage = () => {
-		const newImages = [...images, { url: "", name: "", alt: "" }];
-		setAttributes({ images: newImages });
+		const newIds = [...imageIds, 0];
+		setAttributes({ images: newIds });
 	};
 
 	// Helper to remove an image slot
 	const removeImage = (index) => {
-		const newImages = images.filter((_, i) => i !== index);
-		setAttributes({ images: newImages });
+		const newIds = imageIds.filter((_, i) => i !== index);
+		setAttributes({ images: newIds });
 	};
 
 	const carouselRef = useRef(null);
@@ -117,19 +134,23 @@ export default function Edit({ attributes, setAttributes }) {
 			if (typeof cleanup === "function") cleanup();
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [images, attributes.aspectRatio]);
+	}, [imageData, attributes.aspectRatio]);
 
 	return (
 		<div {...blockProps}>
 			<InspectorControls>
 				<PanelBody title="Menu Carousel Images" initialOpen={true}>
-					{images.length === 0 && (
+					{imageIds.length === 0 && (
 						<div style={{ marginBottom: "1em" }}>No images selected.</div>
 					)}
-					{images.map((imageObj, index) => {
-						const imageUrl = imageObj?.url || "";
-						const imageName = imageObj?.name || "";
-						const imageAlt = imageObj?.alt || "";
+					{imageIds.map((id, index) => {
+						const img = imageData[index];
+						const imageUrl =
+							img?.media_details?.sizes?.thumbnail?.source_url ||
+							img?.source_url ||
+							"";
+						const imageAlt = img?.alt_text || "";
+						const imageTitle = img?.title?.rendered || "";
 						return (
 							<div
 								key={index}
@@ -145,7 +166,7 @@ export default function Edit({ attributes, setAttributes }) {
 									<MediaUpload
 										onSelect={(media) => updateImage(index, media)}
 										allowedTypes={["image"]}
-										value={imageUrl}
+										value={id}
 										render={({ open }) => (
 											<Button
 												onClick={open}
@@ -193,20 +214,22 @@ export default function Edit({ attributes, setAttributes }) {
 										)}
 									/>
 								</MediaUploadCheck>
-								<div style={{ flex: 1, marginRight: "0.5em" }}>
-									<TextControl
-										label="Image Name"
-										value={imageName}
-										onChange={(val) => updateImageField(index, "name", val)}
-										placeholder="Image name"
-										style={{ marginBottom: 4 }}
-									/>
-									<TextControl
-										label="Alt Text"
-										value={imageAlt}
-										onChange={(val) => updateImageField(index, "alt", val)}
-										placeholder="Image alt text"
-									/>
+								<div
+									style={{
+										flex: 1,
+										marginRight: "0.5em",
+										alignSelf: "stretch",
+										display: "flex",
+										flexDirection: "column",
+										justifyContent: "center",
+									}}
+								>
+									<div style={{ fontSize: 12, color: "#666", marginBottom: 4 }}>
+										{imageTitle || "No title"}
+									</div>
+									<div style={{ fontSize: 11, color: "#aaa" }}>
+										{imageAlt ? `Alt: ${imageAlt}` : ""}
+									</div>
 								</div>
 								<IconButton
 									icon="no-alt"
@@ -221,13 +244,19 @@ export default function Edit({ attributes, setAttributes }) {
 					</Button>
 				</PanelBody>
 				<PanelBody title="Carousel Settings" initialOpen={true}>
-					<TextControl
-						label="Aspect Ratio"
-						help="Format: width/height (e.g. 12/13)"
-						value={attributes.aspectRatio || ""}
-						onChange={(val) => setAttributes({ aspectRatio: val })}
+					{/* Keep aspect ratio control */}
+					<input
+						type="text"
+						className="components-text-control__input"
+						style={{ width: "100%", marginTop: 8 }}
 						placeholder="12/13"
+						value={attributes.aspectRatio || ""}
+						onChange={(e) => setAttributes({ aspectRatio: e.target.value })}
+						aria-label="Aspect Ratio"
 					/>
+					<div style={{ fontSize: 12, color: "#666" }}>
+						Format: width/height (e.g. 12/13)
+					</div>
 				</PanelBody>
 			</InspectorControls>
 			<div
@@ -239,15 +268,15 @@ export default function Edit({ attributes, setAttributes }) {
 				}}
 			>
 				<div className="thepi-menu-carousel__slides">
-					{images &&
-						images.length > 0 &&
-						images.map((imageObj, idx) =>
-							imageObj?.url ? (
+					{imageData &&
+						imageData.length > 0 &&
+						imageData.map((img, idx) =>
+							img && img.source_url ? (
 								<img
 									key={idx}
-									src={imageObj.url}
-									alt={imageObj.alt || ""}
-									title={imageObj.name || ""}
+									src={img.source_url}
+									alt={img.alt_text || ""}
+									title={img.title?.rendered || ""}
 									className={`thepi-menu-carousel__slide ${
 										idx === 0 ? "active" : ""
 									}`}
@@ -256,7 +285,7 @@ export default function Edit({ attributes, setAttributes }) {
 							) : null,
 						)}
 				</div>
-				{images?.length > 0 && (
+				{imageData?.length > 0 && (
 					<>
 						<button
 							type="button"
