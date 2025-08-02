@@ -28,6 +28,7 @@ wp-content/backup-*/
 wp-content/plugins/*
 !wp-content/plugins/index.php
 !wp-content/plugins/thepi-core/
+!wp-content/plugins/image-optimizer/
 # Uncomment and add your custom plugin(s) below, e.g.:
 # !wp-content/plugins/my-custom-plugin/
 

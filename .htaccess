@@ -19,3 +19,8 @@ RewriteRule . /index.php [L]
 # Any changes to the directives between these markers will be overwritten.
 
 # END ShortPixelWebp
+php_value upload_max_filesize 64M
+php_value post_max_size 64M
+php_value memory_limit 128M
+php_value max_execution_time 300
+php_value max_input_time 300

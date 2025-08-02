@@ -62,6 +62,7 @@ define('WP_CACHE_KEY_SALT', 'g~t@_oD M[wkR*vd>*HkSvhv]i8Q<hQM+`s^c#@kh7nu`&h64kA
 define('WP_DEBUG', true);
 define('WP_DEBUG_DISPLAY', true);
 define('WP_DEBUG_LOG', true);
+define('WP_MAX_MEMORY_LIMIT', '512M');
 
 
 /**#@-*/
